@@ -1,31 +1,17 @@
 import { Request, Response } from "express";
-import { Token } from "../analyzer/Token";
+import { LexicalAnalyzer } from "../analyzer/LexicalAnalyzer";
 
-class LexicalAnalyzer{
-    private row: number;
-    private column: number;
-    private auxChar: string;
-    private state: number;
-    private tokenList: Token[];
-    private errorList: Token[];
 
-    constructor() {
-        this.row = 1;
-        this.column = 1;
-        this.auxChar = '';
-        this.state = 0;
-        this.tokenList = [];
-        this.errorList = [];
-    }
+export const analyze = (req: Request, res: Response) => {
 
-    scanner(entrada: string){
-        entrada +='#';
-        let char: string; 
+    const input = req.body;
+    let lexicalAnalyzer: LexicalAnalyzer = new LexicalAnalyzer();
 
-        for(let i: number = 0 ; i < entrada.length; i++){
+    let tokenList = lexicalAnalyzer.scanner(input);
+    let errorList = lexicalAnalyzer.getErroList();
 
-            
-        }
-
-    }
+    res.json({
+        "tokens": tokenList,
+        "errors": errorList
+    });
 }

@@ -10,6 +10,9 @@ enum Type{
     STATS_ABRE,
     IGUAL,
     PUNTO_COMA,
+    COMILLAS,
+    PARENTESIS_ABRE,
+    PARENTESIS_CIERRA,
     UNKNOW
 }
 
@@ -20,13 +23,31 @@ class Token{
     private colum: number;
     private lexema: string;
     private typeToken: Type;
+    private typeTokenString: string;
     
     constructor(typeToken: Type, lexema: string, row: number, colum: number){
         this.row = row;
         this.colum = colum;
         this.lexema = lexema;
         this.typeToken = typeToken;
+        this.typeTokenString = Type[typeToken];
 
     }
+    getRow(): number {
+        return this.row;
+    }
+    getColum(): number {
+        return this.colum;
+    }
+    getLexema(): string {
+        return this.lexema;
+    }
+    getTypeToken(): Type {
+        return this.typeToken;
+    }
+    getTypeTokenString(): string {
+        return this.typeTokenString;
+    }
+    
 }
 export { Token , Type}
