@@ -5,17 +5,20 @@ class Pokemon{
     attack: number;
     defense: number;
     ivs: number;
-    urlImg: string;
+    urlImg?: string;
 
-    constructor(name: string, type: string, health: number, attack: number, defense: number) {
-        this.name = name;
-        this.type = type;
-        this.health = health;
-        this.attack = attack;
-        this.defense = defense;
-        this.ivs = Math.round(((health + attack + defense) / 45) * 100);;
-        this.urlImg = `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`;
+    
+    constructor(name?: string, type?: string, health?: number, attack?: number, defense?: number) {
+        this.name = name ?? "";
+        this.type = type ?? "";
+        this.health = health ?? 0;
+        this.attack = attack ?? 0;
+        this.defense = defense ?? 0;
+        this.ivs = 0;     
     }
+
+    
+
     getName(): string {
         return this.name;
     }
@@ -48,8 +51,16 @@ class Pokemon{
     }
 
     getIvs(): number {
-        return this.ivs;
+         this.ivs = Math.round(((this.health+ this.attack + this.defense)/45) * 100) ;
+         return this.ivs;
     }
+
+    getUrlImg(): string {
+        this.urlImg = `https://pokeapi.co/api/v2/pokemon/${this.name.toLowerCase()}`;
+        return this.urlImg;
+    }
+
+
 
 }
 export { Pokemon };

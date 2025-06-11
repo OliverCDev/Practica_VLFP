@@ -29,3 +29,7 @@ Thumbs.db
 .env
 *.env
 *.env.*
+
+*.rar
+*.png
+*.pdf

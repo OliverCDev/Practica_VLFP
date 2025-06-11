@@ -2,60 +2,86 @@ import { Token, Type } from "./Token";
 import { Jugador } from "../models/Jugador";
 import { Pokemon } from "../models/Pokemon.model";
 
-
 export function construirJugadores(tokens: Token[]): Jugador[] {
   const jugadores: Jugador[] = [];
   let i: number = 0;
-
+  
   while (i < tokens.length) {
     const token = tokens[i];
-
-    if (token.getTypeToken() === Type.PALABRA_RESERVADA && token.getLexema() === "Jugador") {
-      // Formato esperado: Jugador : "Nombre" {
+    console.log("Token actual:", token.getLexema());
+    if (
+      token.getTypeToken() === Type.PALABRA_RESERVADA &&
+      token.getLexema() === "Jugador"
+    ) {
+      const jugador: Jugador = new Jugador("", []);
       if (
         tokens[i + 1].getTypeToken() === Type.DOS_PUNTOS &&
-        tokens[i + 2].getTypeToken() === Type.COMILLAS 
+        tokens[i + 2].getTypeToken() === Type.COMILLAS
       ) {
         const nombreJugador = tokens[i + 3].getLexema();
-        const jugador: Jugador = new Jugador(nombreJugador, []);
-        i += 4
+        jugador.setName(nombreJugador.replace(/"/g, ""));
+        i += 4;
 
-        while (i < tokens.length && tokens[i].getTypeToken() !== Type.LLAVE_CIERRA) {
+        while (
+          i < tokens.length &&
+          tokens[i].getTypeToken() !== Type.LLAVE_CIERRA
+        ) {
+          
           if (
-            tokens[i].getTypeToken() === Type.COMILLAS &&
-            tokens[i + 1].getTypeToken() === Type.LLAVE_ABRE &&
-            tokens[i + 2].getTypeToken() === Type.COMILLAS
+            tokens[i - 1].getTypeToken() === Type.COMILLAS &&
+            tokens[i].getTypeToken() === Type.CADENA_DE_TEXTO &&
+            tokens[i + 1].getTypeToken() === Type.COMILLAS
           ) {
-            const nombrePokemon = tokens[i].lexema.replace(/"/g, "");
-            const tipoPokemon = tokens[i + 2].lexema;
+            const pokemon = new Pokemon(); 
+            const nombrePokemon = tokens[i].getLexema().replace(/"/g, "");
+            const tipoPokemon = tokens[i + 3].getLexema();
+            pokemon.setName(nombrePokemon);
+            pokemon.setType(tipoPokemon);
 
-            // Verificamos los stats: [salud]=n; [ataque]=n; [defensa]=n;
-            const salud = parseInt(tokens[i + 9].lexema);
-            const ataque = parseInt(tokens[i + 13].lexema);
-            const defensa = parseInt(tokens[i + 17].lexema);
+            // Luego, en la misma iteración se siguen leyendo stats
+            let j = i;
+            while (
+              j < tokens.length &&
+              tokens[j].getTypeToken() !== Type.PARENTESIS_CIERRA
+            ) {
+              if (
+                tokens[j].getTypeToken() === Type.PALABRA_RESERVADA &&
+                tokens[j].getLexema() == "salud"
+              ) {
+                pokemon.setHealth(Number(tokens[j + 3].getLexema()));
+              } else if (
+                tokens[j].getTypeToken() === Type.PALABRA_RESERVADA &&
+                tokens[j].getLexema().includes("ataque")
+              ) {
+                pokemon.setAttack(Number(tokens[j + 3].getLexema()));
+              } else if (
+                tokens[j].getTypeToken() === Type.PALABRA_RESERVADA &&
+                tokens[j].getLexema().includes("defensa")
+              ) {
+                pokemon.setDefense(Number(tokens[j + 3].getLexema()));
+              }
+              j++;
+            }
 
-            const pokemon: Pokemon = {
-              nombre: nombrePokemon,
-              tipo: tipoPokemon,
-              salud,
-              ataque,
-              defensa,
-            };
+           
+            if (tokens[j].getTypeToken() === Type.PARENTESIS_CIERRA) {
+              pokemon.getIvs();
+              pokemon.getUrlImg();
+              jugador.pokemons.push(pokemon);
+            }
 
-            jugador.pokemons.push(pokemon);
-
-            i += 20; // Avanzar a la siguiente entrada
-          } else {
-            i++; // Evita bucles infinitos si hay un error
+            i = j;
           }
-        }
 
-        jugadores.push(jugador);
+          i++;
+        }
       }
+      jugadores.push(jugador);
     }
 
     i++;
   }
-
+  console.log("Jugadores construidos:", jugadores);
+  console.log(jugadores.map(j => j.getPokemons()));
   return jugadores;
 }

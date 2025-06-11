@@ -18,6 +18,7 @@ class LexicalAnalyzer {
   private auxChar: string;
   private auxWord: string;
   private state: number;
+  private auxNum: number;
   private tokenList: Token[];
   private errorList: Token[];
 
@@ -27,6 +28,7 @@ class LexicalAnalyzer {
     this.auxChar = "";
     this.auxWord = "";
     this.state = 0;
+    this.auxNum = 0;
     this.tokenList = [];
     this.errorList = [];
   }
@@ -34,7 +36,7 @@ class LexicalAnalyzer {
   scanner(input: string) {
     input += "#";
     let char: string;
-
+    let count: number = 0;
     for (let i: number = 0; i < input.length; i++) {
       char = input[i];
       switch (this.state) {
@@ -47,6 +49,7 @@ class LexicalAnalyzer {
             case '"':
               this.state = 3;
               this.addCharacter(char);
+              count++;
               break;
             case "[":
               this.state = 4;
@@ -70,7 +73,7 @@ class LexicalAnalyzer {
               if (input[i - 1] != ":") {
                 this.state = 8;
                 this.addCharacter(char);
-              } 
+              }
               break;
             case ";":
               this.state = 9;
@@ -87,7 +90,7 @@ class LexicalAnalyzer {
               console.log("Fila: " + this.row);
               break;
             case "\r":
-                break;
+              break;
             case "\t":
               this.column += 4;
               break;
@@ -104,12 +107,18 @@ class LexicalAnalyzer {
               this.addCharacter(char);
               break;
             default:
-              // Verifica si es un numero
               if (/\d/.test(char)) {
-                this.state = 10;
+                if (count == 1) {
+                  this.addCharacterWord(char);
+                  this.state = 11;
+                } 
                 this.addCharacter(char);
+                if (input[i + 1] == ";") {
+                  this.state = 10;
+                }
                 break;
-              } else if (/[a-zA-Z]/.test(char)) {
+              } else if (/[a-zA-Z]/.test(char) || count == 1) {
+                console.log("Caracter: " + char);
                 this.state = 11;
                 this.addCharacterWord(char);
                 break;
@@ -117,6 +126,7 @@ class LexicalAnalyzer {
                 // Fin del análisis
                 console.log("Analyze Finished");
               } else {
+                console.log("Caracter: " + char + "---- Contador: " + count);
                 // Error Léxico
                 this.addError(Type.UNKNOW, char, this.row, this.column);
                 this.clear();
@@ -196,6 +206,7 @@ class LexicalAnalyzer {
               this.column
             );
             this.clearWord();
+            count = 0;
           } else if (input[i] == '"') {
             this.addToken(
               Type.CADENA_DE_TEXTO,
@@ -204,6 +215,7 @@ class LexicalAnalyzer {
               this.column
             );
             this.clearWord();
+            count = 0;
           }
           this.clear();
           i--;
