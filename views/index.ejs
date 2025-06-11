@@ -87,7 +87,7 @@
       console.log("Esta es la data -------> " + data)
       if (data.tokens && data.tokens.length > 0) {
         const tbody = document.getElementById("tablaTokensBody");
-        tbody.innerHTML = ""; // limpia
+        tbody.innerHTML = ""; 
         data.tokens.forEach((token, i) => {
           tbody.innerHTML += `
             <tr>

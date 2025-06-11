@@ -38,7 +38,6 @@ export function construirJugadores(tokens: Token[]): Jugador[] {
             pokemon.setName(nombrePokemon);
             pokemon.setType(tipoPokemon);
 
-            // Luego, en la misma iteración se siguen leyendo stats
             let j = i;
             while (
               j < tokens.length &&
